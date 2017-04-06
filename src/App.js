@@ -11,15 +11,23 @@ class App extends Component {
     super(props);
     // unque about this component
     this.state = {
-      data: null
+      data: null,
       newData: ''
     };
+    this.dataRef = null;
+
+    // lock in context
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
   // built in to react compoenent to confirm when a compoennt was loaded what to do
   componentDidMount() {
+    this.dataRef = database.ref('/users')
     // .ref refers to node empty = top node, .on like jquery value change.
     // snapshot is the value of data at the given moment, vs any other time(Real time)
-    database.ref().on('value', (snapshot)=>{
+
+    // .on can be subbed for .once < give you back a promise .once('child_added').then...
+    this.dataRef.on('value', (snapshot)=>{
       this.setState({
         // snapshot is the value of data at the given moment, vs any other time(Real time)
         data: snapshot.val()
@@ -30,12 +38,14 @@ class App extends Component {
   handleChange(event){
     const newData = event.target.value;
     this.setState({
-      newData: newData;
+      // shorthand for newData: newData
+      newData
     })
   }
 
   handleSubmit(event) {
     event.preventDefault();
+      this.dataRef.push(this.state.newData);
   }
 
   render() {
